@@ -40,11 +40,6 @@
 
       if (!preloader || !preloaderBar || !preloaderPercentage) return;
 
-      // Ensure preloader is visible immediately
-      preloader.style.display = 'flex';
-      preloader.style.opacity = '1';
-      preloader.style.visibility = 'visible';
-
       let progress = 0;
       const targetProgress = 100;
       const minDuration = 10000; // 10 seconds minimum
