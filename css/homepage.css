@@ -3,17 +3,6 @@
  * Inherits from design-system.css
  */
 
-/* ============================================
-   SCROLL SNAP PER SECTION
-   ============================================ */
-
-/* Scroll snap only on desktop */
-@media (min-width: 769px) {
-  html {
-    scroll-snap-type: y proximity;
-  }
-}
-
 html {
   scroll-behavior: smooth;
 }
@@ -21,20 +10,6 @@ html {
 body {
   margin: 0;
   padding: 0;
-}
-
-/* Snap targets for each section (desktop only) - footer excluded */
-@media (min-width: 769px) {
-  .hero,
-  .products,
-  .temukan-preview,
-  .portfolio {
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-  }
-
-  /* Footer does NOT snap - free scroll after portfolio */
-  /* Don't set any scroll-snap properties on footer */
 }
 
 /* ============================================
@@ -950,7 +925,6 @@ body {
   .products-mobile-carousel {
     display: flex;
     overflow-x: auto;
-    scroll-snap-type: x mandatory;
     gap: 0;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
@@ -975,7 +949,6 @@ body {
     flex-shrink: 0;
     width: calc(100vw - 20px);
     max-width: calc(100vw - 20px);
-    scroll-snap-align: center;
     display: flex;
     flex-direction: column;
     padding: 0 var(--spacing-4) var(--spacing-6);
