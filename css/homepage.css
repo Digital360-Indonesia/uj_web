@@ -794,18 +794,18 @@ body {
 
 /* PRODUCTS CTA SECTION */
 .products-cta {
-  margin-top: var(--spacing-8);
-  text-align: left;
+  margin-top: var(--spacing-2);
+  text-align: right;
   flex-shrink: 0;
 }
 
 .products-cta-btn {
   display: inline-block;
-  padding: var(--spacing-3) 0;
+  padding: 0;
   background: transparent;
   color: var(--color-primary);
   font-family: 'Bebas Neue', sans-serif;
-  font-size: var(--text-lg);
+  font-size: 24px;
   font-weight: 700;
   text-decoration: none;
   border-radius: 0;
