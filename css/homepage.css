@@ -23,15 +23,19 @@ body {
   padding: 0;
 }
 
-/* Snap targets for each section (desktop only) */
+/* Snap targets for each section (desktop only) - footer excluded */
 @media (min-width: 769px) {
   .hero,
   .products,
   .temukan-preview,
-  .portfolio,
-  .footer-section {
+  .portfolio {
     scroll-snap-align: start;
     scroll-snap-stop: always;
+  }
+
+  /* Footer does NOT snap - free scroll after portfolio */
+  .footer-section {
+    scroll-snap-align: none;
   }
 }
 
@@ -1700,7 +1704,8 @@ body {
 
 .footer-split-left {
   padding: 80px var(--spacing-6, 24px);
-  background: var(--color-dark, #1a1a1a);
+  background: var(--color-light, #ffffff);
+  border: 2px solid var(--color-primary, #E63946);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1762,21 +1767,21 @@ body {
 }
 
 .footer-split-left .footer-split-title {
-  color: var(--color-light, #ffffff);
+  color: var(--color-primary, #E63946);
 }
 
 .footer-split-left .footer-split-subtitle {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(26, 26, 26, 0.7);
 }
 
 .footer-split-left .footer-split-button {
-  background: var(--color-light, #ffffff);
-  color: var(--color-dark, #1a1a1a);
-  border: 2px solid var(--color-light, #ffffff);
+  background: transparent;
+  color: var(--color-primary, #E63946);
+  border: 2px solid var(--color-primary, #E63946);
 }
 
 .footer-split-left .footer-split-button:hover {
-  background: transparent;
+  background: var(--color-primary, #E63946);
   color: var(--color-light, #ffffff);
 }
 
