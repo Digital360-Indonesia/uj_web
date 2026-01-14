@@ -416,10 +416,11 @@
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
     scrollbar-width: none;
     gap: 0;
-    margin: 0 -24px;
-    padding: 0 24px;
+    margin: 0 -16px;
+    padding: 0 16px;
   }
 
   .product-slide {
@@ -820,6 +821,27 @@
     .products-mobile-carousel {
       display: flex;
     }
+
+    /* Clean up window frame on mobile */
+    .product-model-image {
+      padding: 0;
+      max-width: 100%;
+      min-width: auto;
+      height: auto;
+      border: 2px solid #d1d5db;
+    }
+
+    .product-model-image::before {
+      display: none;
+    }
+
+    .product-model-image::after {
+      display: none;
+    }
+
+    .product-model-img {
+      padding-top: 0;
+    }
   }
 
   @media (max-width: 480px) {
@@ -834,6 +856,51 @@
 </style>
 
 <script>
+  // Mobile auto swipe functionality
+  (function() {
+    'use strict';
+
+    const mobileCarousel = document.querySelector('.products-mobile-carousel');
+    if (!mobileCarousel) return;
+
+    let currentIndex = 0;
+    const slides = document.querySelectorAll('.product-slide');
+    const totalSlides = slides.length;
+    const autoScrollDelay = 4000; // 4 seconds per slide
+
+    // Get slide width dynamically
+    const getSlideWidth = () => {
+      const slide = slides[0];
+      if (!slide) return window.innerWidth;
+      return slide.offsetWidth;
+    };
+
+    // Auto scroll function
+    const autoScroll = () => {
+      currentIndex = (currentIndex + 1) % totalSlides;
+      mobileCarousel.scrollTo({
+        left: currentIndex * getSlideWidth(),
+        behavior: 'smooth'
+      });
+    };
+
+    // Start auto scroll
+    let autoScrollInterval = setInterval(autoScroll, autoScrollDelay);
+
+    // Pause auto scroll on user interaction
+    mobileCarousel.addEventListener('touchstart', () => {
+      clearInterval(autoScrollInterval);
+    });
+
+    mobileCarousel.addEventListener('touchend', () => {
+      autoScrollInterval = setInterval(autoScroll, autoScrollDelay);
+    });
+
+    mobileCarousel.addEventListener('scroll', () => {
+      clearInterval(autoScrollInterval);
+    });
+  })();
+
   // Product tabs functionality for desktop
   const tabs = document.querySelectorAll('.sport-icon-tab');
   const models = document.querySelectorAll('.product-model-item');

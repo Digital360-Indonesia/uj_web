@@ -128,10 +128,12 @@ const whatsappUrl = 'https://wa.me/6285117088199?text=Halo%20UNO%20JERSEY,%20say
 
     .banner-slider {
       gap: 12px;
+      height: 200px;
     }
 
     .banner-slide {
       border-radius: 16px;
+      width: calc(100vw - 32px);
     }
   }
 </style>
@@ -147,13 +149,19 @@ const whatsappUrl = 'https://wa.me/6285117088199?text=Halo%20UNO%20JERSEY,%20say
     const slides = document.querySelectorAll('.banner-slide');
     const totalSlides = slides.length;
     const autoScrollDelay = 4000; // 4 seconds per slide
-    const slideWidth = 1136 + 16; // slide width + gap
+
+    // Get slide width dynamically (responsive)
+    const getSlideWidth = () => {
+      const slide = slides[0];
+      if (!slide) return 1136 + 16;
+      return slide.offsetWidth + 16; // slide width + gap
+    };
 
     // Auto scroll function
     const autoScroll = () => {
       currentIndex = (currentIndex + 1) % totalSlides;
       slider.scrollTo({
-        left: currentIndex * slideWidth,
+        left: currentIndex * getSlideWidth(),
         behavior: 'smooth'
       });
     };
