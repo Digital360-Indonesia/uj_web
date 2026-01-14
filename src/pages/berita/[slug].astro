@@ -1,0 +1,294 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+---
+
+<Layout title={post.data.title} description={post.data.description} showPreloader={false}>
+  <div class="blog-container">
+    <article class="blog-post">
+      <header class="blog-post-header">
+        <div class="blog-post-meta">
+          <time datetime={post.data.pubDate.toISOString()}>
+            {post.data.pubDate.toLocaleDateString('id-ID', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+          </time>
+          {post.data.category && (
+            <>
+              <span class="meta-separator">•</span>
+              <span class="category">{post.data.category}</span>
+            </>
+          )}
+          {post.data.location && (
+            <>
+              <span class="meta-separator">•</span>
+              <span class="location">{post.data.location}</span>
+            </>
+          )}
+        </div>
+
+        <h1 class="blog-post-title">
+          {post.data.title}
+        </h1>
+
+        {post.data.description && (
+          <p class="blog-post-excerpt">
+            {post.data.description}
+          </p>
+        )}
+
+        {post.data.featuredImage && (
+          <div class="blog-post-featured-image">
+            <img
+              src={post.data.featuredImage}
+              alt={post.data.title}
+              loading="eager"
+            />
+          </div>
+        )}
+      </header>
+
+      <div class="blog-post-content">
+        <Content />
+      </div>
+
+      <footer class="blog-post-footer">
+        <a href="/berita/" class="back-to-blog">
+          ← Kembali ke Berita
+        </a>
+
+        {post.data.tags.length > 0 && (
+          <div class="blog-tags">
+            <span class="tags-label">Tags:</span>
+            {post.data.tags.map((tag) => (
+              <span class="tag">{tag}</span>
+            ))}
+          </div>
+        )}
+      </footer>
+    </article>
+  </div>
+</Layout>
+
+<style>
+  .blog-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 120px 20px 80px;
+    min-height: 100vh;
+  }
+
+  .blog-post {
+    max-width: 800px;
+    margin: 0 auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  .blog-post-header {
+    margin-bottom: 48px;
+  }
+
+  .blog-post-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: #888;
+    margin-bottom: 20px;
+  }
+
+  .meta-separator {
+    color: #ccc;
+  }
+
+  .category,
+  .location {
+    color: #1a1a1a;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+
+  .blog-post-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(42px, 6vw, 56px);
+    font-weight: 400;
+    color: #1a1a1a;
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+
+  .blog-post-excerpt {
+    font-family: 'Inter', sans-serif;
+    font-size: 20px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+
+  .blog-post-featured-image {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-top: 32px;
+  }
+
+  .blog-post-featured-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .blog-post-content {
+    font-family: 'Inter', sans-serif;
+    font-size: 17px;
+    line-height: 1.8;
+    color: #333;
+  }
+
+  .blog-post-content :global(h2) {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    font-weight: 400;
+    color: #1a1a1a;
+    letter-spacing: 0.02em;
+    margin-top: 48px;
+    margin-bottom: 20px;
+  }
+
+  .blog-post-content :global(h3) {
+    font-family: 'Inter', sans-serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-top: 36px;
+    margin-bottom: 16px;
+  }
+
+  .blog-post-content :global(p) {
+    margin-bottom: 20px;
+  }
+
+  .blog-post-content :global(ul),
+  .blog-post-content :global(ol) {
+    margin-bottom: 20px;
+    padding-left: 24px;
+  }
+
+  .blog-post-content :global(li) {
+    margin-bottom: 8px;
+  }
+
+  .blog-post-content :global(a) {
+    color: #1a1a1a;
+    text-decoration: underline;
+    font-weight: 500;
+  }
+
+  .blog-post-content :global(a:hover) {
+    color: #666;
+  }
+
+  .blog-post-content :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin: 32px 0;
+  }
+
+  .blog-post-content :global(blockquote) {
+    border-left: 4px solid #1a1a1a;
+    padding-left: 20px;
+    margin: 32px 0;
+    font-style: italic;
+    color: #666;
+  }
+
+  .blog-post-footer {
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px solid #eee;
+  }
+
+  .back-to-blog {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: #1a1a1a;
+    text-decoration: none;
+    margin-bottom: 24px;
+    transition: color 0.2s;
+  }
+
+  .back-to-blog:hover {
+    color: #666;
+  }
+
+  .blog-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .tags-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .tag {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #666;
+    background: #f5f5f5;
+    padding: 6px 14px;
+    border-radius: 20px;
+    text-transform: capitalize;
+  }
+
+  @media (max-width: 768px) {
+    .blog-container {
+      padding: 100px 16px 60px;
+    }
+
+    .blog-post-title {
+      font-size: 36px;
+    }
+
+    .blog-post-excerpt {
+      font-size: 18px;
+    }
+
+    .blog-post-content {
+      font-size: 16px;
+    }
+
+    .blog-post-content :global(h2) {
+      font-size: 28px;
+      margin-top: 32px;
+    }
+
+    .blog-post-content :global(h3) {
+      font-size: 20px;
+    }
+  }
+</style>

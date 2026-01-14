@@ -1,0 +1,213 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+const allPosts = await getCollection('blog');
+const sortedPosts = allPosts.sort((a, b) =>
+  new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf()
+);
+---
+
+<Layout title="Berita | UNO JERSEY" showPreloader={false}>
+  <div class="blog-container">
+    <header class="blog-header">
+      <h1 class="blog-title">Berita</h1>
+      <p class="blog-subtitle">
+        Artikel, tips, dan informasi seputar jersey custom untuk tim dan komunitas Anda
+      </p>
+    </header>
+
+    <div class="blog-grid">
+      {sortedPosts.map((post) => (
+        <article class="blog-card">
+          <a href={`/berita/${post.slug}/`} class="blog-card-link">
+            {post.data.featuredImage && (
+              <div class="blog-card-image">
+                <img
+                  src={post.data.featuredImage}
+                  alt={post.data.title}
+                  loading="lazy"
+                />
+              </div>
+            )}
+            <div class="blog-card-content">
+              <div class="blog-card-meta">
+                <time datetime={post.data.pubDate.toISOString()}>
+                  {post.data.pubDate.toLocaleDateString('id-ID', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </time>
+                {post.data.category && (
+                  <>
+                    <span class="meta-separator">•</span>
+                    <span class="category">{post.data.category}</span>
+                  </>
+                )}
+              </div>
+              <h2 class="blog-card-title">
+                {post.data.title}
+              </h2>
+              <p class="blog-card-excerpt">
+                {post.data.description}
+              </p>
+            </div>
+          </a>
+        </article>
+      ))}
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .blog-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 20px 40px;
+    min-height: 100vh;
+  }
+
+  .blog-header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .blog-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 8vw, 72px);
+    font-weight: 400;
+    color: #1a1a1a;
+    letter-spacing: 0.02em;
+    margin-bottom: 16px;
+  }
+
+  .blog-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 32px;
+    margin-top: 40px;
+  }
+
+  .blog-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .blog-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .blog-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .blog-card-image {
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
+    background: #f5f5f5;
+  }
+
+  .blog-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .blog-card:hover .blog-card-image img {
+    transform: scale(1.05);
+  }
+
+  .blog-card-content {
+    padding: 24px;
+  }
+
+  .blog-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 12px;
+  }
+
+  .meta-separator {
+    color: #ccc;
+  }
+
+  .category {
+    color: #1a1a1a;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+
+  .blog-card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: #1a1a1a;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .blog-card-excerpt {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: #666;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .blog-container {
+      padding: 60px 16px 30px;
+    }
+
+    .blog-title {
+      font-size: 40px;
+    }
+
+    .blog-subtitle {
+      font-size: 16px;
+    }
+
+    .blog-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .blog-card-image {
+      height: 200px;
+    }
+
+    .blog-card-content {
+      padding: 20px;
+    }
+
+    .blog-card-title {
+      font-size: 24px;
+    }
+  }
+</style>
