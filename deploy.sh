@@ -33,16 +33,3 @@ sudo -u "$DEPLOY_USER" npm run build
 
 echo "📁 Build complete - files ready in dist/ directory"
 echo "📍 Repository location: $(pwd)"
-
-echo "🚀 Starting PM2 preview server (as $DEPLOY_USER)..."
-# Jalankan dari project directory untuk akses vite.config.js
-if sudo -u "$DEPLOY_USER" pm2 list | grep -q "$PM2_APP_NAME"; then
-    sudo -u "$DEPLOY_USER" pm2 restart "$PM2_APP_NAME"
-else
-    sudo -u "$DEPLOY_USER" pm2 start npm --name "$PM2_APP_NAME" -- start
-fi
-
-echo "✅ Deployment completed!"
-echo "🌐 Site running at: http://localhost:9904"
-echo "📊 PM2 Status:"
-sudo -u "$DEPLOY_USER" pm2 list
