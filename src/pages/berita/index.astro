@@ -19,15 +19,16 @@ const sortedPosts = allPosts.sort((a, b) =>
 
     <div class="blog-grid" id="blogGrid">
       {sortedPosts.slice(0, 6).map((post, index) => (
-        <article class="blog-card" data-index={index}>
+        <article class="blog-card loaded" data-index={index}>
           <a href={`/berita/${post.slug}/`} class="blog-card-link">
             {post.data.featuredImage && (
               <div class="blog-card-image">
                 <img
-                  src={post.data.featuredImage}
+                  data-src={post.data.featuredImage}
                   alt={post.data.title}
-                  loading="lazy"
+                  class="lazy-img"
                 />
+                <div class="skeleton-image"></div>
               </div>
             )}
             <div class="blog-card-content">
@@ -74,6 +75,52 @@ const sortedPosts = allPosts.sort((a, b) =>
     (function() {
       'use strict';
 
+      // Lazy load images with IntersectionObserver
+      const lazyLoadImages = () => {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const img = entry.target;
+              const src = img.getAttribute('data-src');
+
+              if (src) {
+                img.onload = () => {
+                  img.classList.add('loaded');
+                  const skeleton = img.parentElement?.querySelector('.skeleton-image');
+                  if (skeleton) {
+                    skeleton.style.opacity = '0';
+                    setTimeout(() => skeleton.remove(), 300);
+                  }
+                };
+                img.src = src;
+                observer.unobserve(img);
+              }
+            }
+          });
+        }, {
+          rootMargin: '50px',
+          threshold: 0.1
+        });
+
+        document.querySelectorAll('.lazy-img').forEach(img => {
+          imageObserver.observe(img);
+        });
+      };
+
+      // Initialize lazy loading
+      if ('IntersectionObserver' in window) {
+        lazyLoadImages();
+      } else {
+        // Fallback for older browsers
+        document.querySelectorAll('.lazy-img').forEach(img => {
+          const src = img.getAttribute('data-src');
+          if (src) {
+            img.src = src;
+            img.classList.add('loaded');
+          }
+        });
+      }
+
       const blogGrid = document.getElementById('blogGrid');
       const loadMoreBtn = document.getElementById('loadMoreBtn');
 
@@ -84,69 +131,153 @@ const sortedPosts = allPosts.sort((a, b) =>
       const totalPosts = sortedPosts.length;
       const totalPages = Math.ceil(totalPosts / postsPerPage);
 
+      // Create skeleton card
+      const createSkeletonCard = () => {
+        const article = document.createElement('article');
+        article.className = 'blog-card skeleton';
+        article.innerHTML = `
+          <div class="blog-card-link">
+            <div class="blog-card-image">
+              <div class="skeleton-image" style="position: absolute; inset: 0;"></div>
+            </div>
+            <div class="blog-card-content">
+              <div class="skeleton-meta"></div>
+              <div class="skeleton-title"></div>
+              <div class="skeleton-title"></div>
+              <div class="skeleton-excerpt"></div>
+              <div class="skeleton-excerpt"></div>
+              <div class="skeleton-excerpt"></div>
+            </div>
+          </div>
+        `;
+        return article;
+      };
+
       loadMoreBtn.addEventListener('click', function() {
         currentPage++;
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.innerHTML = `
+          <span class="spinner"></span>
+          Memuat...
+        `;
 
         const startIndex = currentPage * postsPerPage;
         const endIndex = startIndex + postsPerPage;
         const postsToShow = sortedPosts.slice(startIndex, endIndex);
 
-        postsToShow.forEach((post, index) => {
-          const globalIndex = startIndex + index;
-          const article = document.createElement('article');
-          article.className = 'blog-card';
-          article.style.opacity = '0';
-          article.style.transform = 'translateY(20px)';
-
-          article.innerHTML = `
-            <a href="/berita/${post.slug}/" class="blog-card-link">
-              ${post.data.featuredImage ? `
-                <div class="blog-card-image">
-                  <img
-                    src="${post.data.featuredImage}"
-                    alt="${post.data.title}"
-                    loading="lazy"
-                  />
-                </div>
-              ` : ''}
-              <div class="blog-card-content">
-                <div class="blog-card-meta">
-                  <time datetime="${post.data.pubDate.toISOString()}">
-                    ${post.data.pubDate.toLocaleDateString('id-ID', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </time>
-                  ${post.data.category ? `
-                    <span class="meta-separator">•</span>
-                    <span class="category">${post.data.category}</span>
-                  ` : ''}
-                </div>
-                <h2 class="blog-card-title">
-                  ${post.data.title}
-                </h2>
-                <p class="blog-card-excerpt">
-                  ${post.data.description}
-                </p>
-              </div>
-            </a>
-          `;
-
-          blogGrid.appendChild(article);
-
-          // Animate in
-          setTimeout(() => {
-            article.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            article.style.opacity = '1';
-            article.style.transform = 'translateY(0)';
-          }, index * 100);
+        // Add skeleton cards first
+        const skeletons = [];
+        postsToShow.forEach(() => {
+          const skeleton = createSkeletonCard();
+          blogGrid.appendChild(skeleton);
+          skeletons.push(skeleton);
         });
 
-        // Hide button if all posts are loaded
-        if (currentPage >= totalPages) {
-          loadMoreBtn.style.display = 'none';
-        }
+        // Simulate network delay and show real content
+        setTimeout(() => {
+          skeletons.forEach((skeleton, index) => {
+            const post = postsToShow[index];
+            if (!post) return;
+
+            const article = document.createElement('article');
+            article.className = 'blog-card loaded';
+            article.style.opacity = '0';
+            article.style.transform = 'translateY(20px)';
+
+            article.innerHTML = `
+              <a href="/berita/${post.slug}/" class="blog-card-link">
+                ${post.data.featuredImage ? `
+                  <div class="blog-card-image">
+                    <img
+                      data-src="${post.data.featuredImage}"
+                      alt="${post.data.title}"
+                      class="lazy-img"
+                    />
+                    <div class="skeleton-image"></div>
+                  </div>
+                ` : ''}
+                <div class="blog-card-content">
+                  <div class="blog-card-meta">
+                    <time datetime="${post.data.pubDate.toISOString()}">
+                      ${post.data.pubDate.toLocaleDateString('id-ID', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </time>
+                    ${post.data.category ? `
+                      <span class="meta-separator">•</span>
+                      <span class="category">${post.data.category}</span>
+                    ` : ''}
+                  </div>
+                  <h2 class="blog-card-title">
+                    ${post.data.title}
+                  </h2>
+                  <p class="blog-card-excerpt">
+                    ${post.data.description}
+                  </p>
+                </div>
+              </a>
+            `;
+
+            blogGrid.replaceChild(article, skeleton);
+
+            // Lazy load the new image
+            const newImg = article.querySelector('.lazy-img');
+            if (newImg && 'IntersectionObserver' in window) {
+              const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                  if (entry.isIntersecting) {
+                    const img = entry.target;
+                    const src = img.getAttribute('data-src');
+                    if (src) {
+                      img.onload = () => {
+                        img.classList.add('loaded');
+                        const skel = img.parentElement?.querySelector('.skeleton-image');
+                        if (skel) {
+                          skel.style.opacity = '0';
+                          setTimeout(() => skel.remove(), 300);
+                        }
+                      };
+                      img.src = src;
+                      observer.unobserve(img);
+                    }
+                  }
+                });
+              }, {
+                rootMargin: '50px',
+                threshold: 0.1
+              });
+              imageObserver.observe(newImg);
+            } else if (newImg) {
+              const src = newImg.getAttribute('data-src');
+              if (src) {
+                newImg.src = src;
+                newImg.classList.add('loaded');
+              }
+            }
+
+            // Animate in
+            setTimeout(() => {
+              article.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+              article.style.opacity = '1';
+              article.style.transform = 'translateY(0)';
+            }, index * 100);
+          });
+
+          // Reset button
+          if (currentPage >= totalPages) {
+            loadMoreBtn.style.display = 'none';
+          } else {
+            loadMoreBtn.disabled = false;
+            loadMoreBtn.innerHTML = `
+              Muat Lebih Banyak
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M12 5v14M5 12l7 7 7-7"/>
+              </svg>
+            `;
+          }
+        }, 500);
       });
     })();
   </script>
@@ -198,7 +329,7 @@ const sortedPosts = allPosts.sort((a, b) =>
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .blog-card:hover {
+  .blog-card.loaded:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
   }
@@ -214,17 +345,47 @@ const sortedPosts = allPosts.sort((a, b) =>
     height: 240px;
     overflow: hidden;
     background: #f5f5f5;
+    position: relative;
   }
 
   .blog-card-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .blog-card:hover .blog-card-image img {
+  .blog-card-image img.loaded {
+    opacity: 1;
+  }
+
+  .blog-card.loaded:hover .blog-card-image img.loaded {
     transform: scale(1.05);
+  }
+
+  /* Skeleton image */
+  .skeleton-image {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      #f0f0f0 25%,
+      #e0e0e0 50%,
+      #f0f0f0 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    transition: opacity 0.3s ease;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
   }
 
   .blog-card-content {
@@ -272,6 +433,60 @@ const sortedPosts = allPosts.sort((a, b) =>
     overflow: hidden;
   }
 
+  /* Skeleton elements */
+  .skeleton {
+    pointer-events: none;
+  }
+
+  .skeleton-meta {
+    width: 120px;
+    height: 14px;
+    background: linear-gradient(
+      90deg,
+      #f0f0f0 25%,
+      #e0e0e0 50%,
+      #f0f0f0 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+
+  .skeleton-title {
+    width: 100%;
+    height: 28px;
+    background: linear-gradient(
+      90deg,
+      #f0f0f0 25%,
+      #e0e0e0 50%,
+      #f0f0f0 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+
+  .skeleton-excerpt {
+    width: 100%;
+    height: 14px;
+    background: linear-gradient(
+      90deg,
+      #f0f0f0 25%,
+      #e0e0e0 50%,
+      #f0f0f0 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+
+  .skeleton-excerpt:last-child {
+    width: 70%;
+  }
+
   .load-more-container {
     display: flex;
     justify-content: center;
@@ -294,10 +509,15 @@ const sortedPosts = allPosts.sort((a, b) =>
     transition: all 0.3s ease;
   }
 
-  .load-more-btn:hover {
+  .load-more-btn:hover:not(:disabled) {
     background: #c1121f;
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(230, 57, 70, 0.3);
+  }
+
+  .load-more-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
   }
 
   .load-more-btn:active {
@@ -308,8 +528,24 @@ const sortedPosts = allPosts.sort((a, b) =>
     transition: transform 0.3s ease;
   }
 
-  .load-more-btn:hover svg {
+  .load-more-btn:hover:not(:disabled) svg {
     transform: translateY(2px);
+  }
+
+  /* Spinner */
+  .spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   @media (max-width: 768px) {
