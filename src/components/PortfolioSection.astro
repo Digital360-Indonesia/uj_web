@@ -329,8 +329,12 @@
     // Clear existing items
     portfolioGrid.innerHTML = '';
 
+    // On mobile, only show first 2 items
+    const isMobile = window.innerWidth <= 768;
+    const itemsToShow = isMobile ? portfolioItems.slice(0, 2) : portfolioItems;
+
     // Generate portfolio cards
-    portfolioItems.forEach((item, index) => {
+    itemsToShow.forEach((item, index) => {
       const card = document.createElement('div');
       card.className = `portfolio-card portfolio-${item.size}`;
       card.dataset.category = item.category;
