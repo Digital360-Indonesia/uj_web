@@ -262,6 +262,13 @@ const sortedPosts = allPosts.sort((a, b) =>
               article.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
               article.style.opacity = '1';
               article.style.transform = 'translateY(0)';
+
+              // Remove inline styles after animation completes to match server-rendered cards
+              setTimeout(() => {
+                article.style.transition = '';
+                article.style.opacity = '';
+                article.style.transform = '';
+              }, 500);
             }, index * 100);
           });
 
