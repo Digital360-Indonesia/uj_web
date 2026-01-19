@@ -1,0 +1,150 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+---
+
+<Layout title="Katalog Jersey | UNO JERSEY" showNavbar={false} showPreloader={false}>
+  <!-- Navigation (with black logo, visible from start, static tagline) -->
+  <Navbar logoColor="black" showLogo={true} staticTagline={true} />
+
+  <main>
+    <!-- Hero Section (same style as tentang-kami) -->
+    <section class="tentang-hero">
+      <div class="hero-background"></div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <h1 class="hero-title">
+          <span class="title-line">Katalog Jersey</span>
+        </h1>
+        <p class="hero-subtitle">Lihat koleksi jersey premium kami</p>
+      </div>
+    </section>
+
+    <!-- PDF Viewer Section -->
+    <section class="tentang-content">
+      <div class="content-container">
+        <div class="pdf-wrapper">
+          <embed
+            src="/katalog-jersey-baseball.pdf"
+            type="application/pdf"
+            class="pdf-viewer"
+          />
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  /* Hero Section (same as tentang-kami) */
+  .tentang-hero {
+    position: relative;
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .hero-background {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #E63946 0%, #F4A261 100%);
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    color: white;
+    padding: 120px 40px 60px;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 10vw, 120px);
+    line-height: 0.9;
+    margin-bottom: 20px;
+  }
+
+  .title-line {
+    display: block;
+    opacity: 1;
+  }
+
+  .title-line.highlight {
+    color: #F1FA8C;
+  }
+
+  .hero-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(16px, 2vw, 20px);
+    font-weight: 300;
+    opacity: 1;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  /* Catalog Content Section */
+  .tentang-content {
+    padding: 80px 40px;
+    background: #ffffff;
+    min-height: 100vh;
+  }
+
+  .content-container {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .pdf-wrapper {
+    width: 100%;
+    height: 100vh;
+    background: #f5f5f5;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .pdf-viewer {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .tentang-hero {
+      min-height: 40vh;
+    }
+
+    .hero-subtitle {
+      font-size: 14px;
+    }
+
+    .hero-content {
+      padding: 100px 20px 40px;
+    }
+
+    .tentang-content {
+      padding: 40px 16px;
+    }
+
+    .pdf-wrapper {
+      height: 80vh;
+      border-radius: 12px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-content {
+      padding: 100px 20px 40px;
+    }
+  }
+</style>
