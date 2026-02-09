@@ -80,7 +80,7 @@ Jika Anda sedang mencari layanan jersey printing berkualitas, Uno Jersey adalah 
 
 - Website: unojersey.com
 - Alamat: Jl. Sidosermo Indah Gg. III No. 37, Tomohon
-- WhatsApp: 0851 1708 8199
+- WhatsApp: 0851 1773 4599
 - Instagram: @unojersey
 - TikTok: @unojersey
 

@@ -80,7 +80,7 @@ Jika Anda sedang mencari layanan jersey futsal berkualitas, Uno Jersey adalah pi
 
 - Website: unojersey.com
 - Alamat: Jl. Sidosermo Indah Gg. III No. 37, Surabaya
-- WhatsApp: 0851 1708 8199
+- WhatsApp: 0851 1773 4599
 - Instagram: @unojersey
 - TikTok: @unojersey
 

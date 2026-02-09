@@ -140,7 +140,7 @@ Untuk informasi lebih lanjut dan pemesanan jaket komunitas atau fans club custom
 
 
 
-📌 Uno Jersey📱 WhatsApp: 0851-1708-8199📍 Google Maps: Uno Jersey
+📌 Uno Jersey📱 WhatsApp: 0851-1773-4599📍 Google Maps: Uno Jersey
 
 
 
