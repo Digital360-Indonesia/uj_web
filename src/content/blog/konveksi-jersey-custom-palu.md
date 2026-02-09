@@ -1,6 +1,6 @@
 ---
 title: "Konveksi Jersey Custom di Palu - Uno Jersey"
-description: "Pesan jersey custom berkualitas dari UNO JERSEY di Palu! Desain eksklusif dan bahan premium. Hubungi 085117088199 sekarang!"
+description: "Pesan jersey custom berkualitas dari UNO JERSEY di Palu! Desain eksklusif dan bahan premium. Hubungi 085117734599 sekarang!"
 pubDate: 2024-02-27
 category: "Konveksi Jersey"
 location: "Palu"

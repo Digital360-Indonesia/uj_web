@@ -1,6 +1,6 @@
 ---
 title: "Konveksi Jersey Custom di Singkawang - Uno Jersey"
-description: "Pesan jersey custom berkualitas dari UNO JERSEY di Singkawang! Desain eksklusif dan bahan premium. Hubungi 085117088199 sekarang!"
+description: "Pesan jersey custom berkualitas dari UNO JERSEY di Singkawang! Desain eksklusif dan bahan premium. Hubungi 085117734599 sekarang!"
 pubDate: 2024-02-27
 category: "Konveksi Jersey"
 location: "Singkawang"
