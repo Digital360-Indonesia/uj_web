@@ -65,4 +65,4 @@ Logo tim: Meningkatkan kebanggaan tim.
 
 
 
-Ingin membuat jersey futsal custom yang nyaman dan tahan lama? Hubungi Uno Jersey sekarang di 0851-1773-4599 atau kunjungi kami di Jl. Sidosermo Indah Gg. III No. 37, Surabaya. Minimal pemesanan 1 pcs, desain sesuai keinginan Anda!
+Ingin membuat jersey futsal custom yang nyaman dan tahan lama? Hubungi Uno Jersey sekarang di 0851-1708-8199 atau kunjungi kami di Jl. Sidosermo Indah Gg. III No. 37, Surabaya. Minimal pemesanan 1 pcs, desain sesuai keinginan Anda!

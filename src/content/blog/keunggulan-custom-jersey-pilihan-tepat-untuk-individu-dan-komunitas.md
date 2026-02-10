@@ -68,11 +68,11 @@ Selain komunitas, custom jersey juga sangat cocok untuk individu yang ingin tamp
 
 
 
-1. Hubungi Uno Jersey melalui WhatsApp di 0851-1773-4599.
+1. Hubungi Uno Jersey melalui WhatsApp di 0851-1708-8199.
 2. Diskusikan desain dan bahan yang Anda inginkan.
 3. Tim Uno Jersey akan memberikan sampel desain sebelum produksi dimulai.
 4. Pesanan selesai dalam waktu singkat dengan hasil yang memuaskan.
 
 
 
-Ingin membuat custom jersey dengan desain yang unik dan kualitas terbaik? Hubungi Uno Jersey sekarang di 0851-1773-4599 atau kunjungi kami di Jl. Sidosermo Indah Gg. III No. 37, Surabaya! Pesan minimal 1 pcs, kami siap melayani kebutuhan Anda!
+Ingin membuat custom jersey dengan desain yang unik dan kualitas terbaik? Hubungi Uno Jersey sekarang di 0851-1708-8199 atau kunjungi kami di Jl. Sidosermo Indah Gg. III No. 37, Surabaya! Pesan minimal 1 pcs, kami siap melayani kebutuhan Anda!

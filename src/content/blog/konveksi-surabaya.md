@@ -138,7 +138,7 @@ Kalau kamu sedang cari konveksi yang benar-benar fokus pada jersey custom, maka 
 
 
 
-💬 WhatsApp: 0851 1773 4599🌐 Website: unojersey.com📍 Lokasi: Surabaya, melayani pengiriman seluruh indonesia
+💬 WhatsApp: 0851 1708 8199🌐 Website: unojersey.com📍 Lokasi: Surabaya, melayani pengiriman seluruh indonesia
 
 
 
@@ -178,4 +178,4 @@ Jawaban:Waktu pengerjaan normal kami adalah 7–18 hari kerja, tergantung jumlah
 
 
 
-Jawaban:Anda bisa langsung menghubungi tim kami melalui WhatsApp di 0851 1773 4599 atau kunjungi website unojersey.com untuk konsultasi desain dan pemesanan.
+Jawaban:Anda bisa langsung menghubungi tim kami melalui WhatsApp di 0851 1708 8199 atau kunjungi website unojersey.com untuk konsultasi desain dan pemesanan.

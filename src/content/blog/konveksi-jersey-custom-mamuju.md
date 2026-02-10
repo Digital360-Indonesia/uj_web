@@ -1,6 +1,6 @@
 ---
 title: "Konveksi Jersey Custom di Mamuju - Uno Jersey"
-description: "Pesan jersey custom berkualitas dari UNO JERSEY di Mamuju! Desain eksklusif dan bahan premium. Hubungi 085117734599 sekarang!"
+description: "Pesan jersey custom berkualitas dari UNO JERSEY di Mamuju! Desain eksklusif dan bahan premium. Hubungi 085117088199 sekarang!"
 pubDate: 2024-02-27
 category: "Konveksi Jersey"
 location: "Mamuju"
@@ -99,7 +99,7 @@ Jika Anda sedang mencari layanan jersey futsal berkualitas, Uno Jersey adalah pi
 
 - Website: unojersey.com
 - Alamat: Jl. Sidosermo Indah Gg. III No. 37, Surabaya
-- WhatsApp: 0851 1773 4599
+- WhatsApp: 0851 1708 8199
 - Instagram: @unojersey
 - TikTok: @unojersey
 
