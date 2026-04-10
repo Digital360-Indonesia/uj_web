@@ -1,60 +1,73 @@
 ---
-import { getCollection } from 'astro:content';
+import { getBlogPostBySlug, getAllBlogPosts } from '../../lib/blog';
 import Layout from '../../layouts/Layout.astro';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
+  const posts = await getAllBlogPosts();
   return posts.map((post) => ({
     params: { slug: post.slug },
-    props: { post },
+    props: {
+      post,
+      allPosts: posts,
+    },
   }));
 }
 
-const { post } = Astro.props;
-const { Content } = await post.render();
+const { post, allPosts } = Astro.props;
+
+// Render markdown body ke HTML
+let renderedBody = post.body;
+if (post.body && !post.body.startsWith('<')) {
+  try {
+    const { marked } = await import('marked');
+    renderedBody = await marked(post.body);
+  } catch {
+    renderedBody = post.body.replace(/\n/g, '<br>');
+  }
+}
 ---
 
-<Layout title={post.data.title} description={post.data.description} showPreloader={false}>
+<Layout title={post.title} description={post.excerpt} showPreloader={false}>
   <div class="blog-container">
     <article class="blog-post">
       <header class="blog-post-header">
         <div class="blog-post-meta">
-          <time datetime={post.data.pubDate.toISOString()}>
-            {post.data.pubDate.toLocaleDateString('id-ID', {
+          <time datetime={post.pubDate}>
+            {new Date(post.pubDate).toLocaleDateString('id-ID', {
               year: 'numeric',
               month: 'long',
               day: 'numeric'
             })}
           </time>
-          {post.data.category && (
+          {post.category && (
             <>
               <span class="meta-separator">•</span>
-              <span class="category">{post.data.category}</span>
+              <span class="category">{post.category}</span>
             </>
           )}
-          {post.data.location && (
+          {post.location && (
             <>
               <span class="meta-separator">•</span>
-              <span class="location">{post.data.location}</span>
+              <span class="location">{post.location}</span>
             </>
           )}
         </div>
 
         <h1 class="blog-post-title">
-          {post.data.title}
+          {post.title}
         </h1>
 
-        {post.data.description && (
+        {post.excerpt && (
           <p class="blog-post-excerpt">
-            {post.data.description}
+            {post.excerpt}
           </p>
         )}
 
-        {post.data.featuredImage && (
+        {post.image && (
           <div class="blog-post-featured-image">
             <img
-              src={post.data.featuredImage}
-              alt={post.data.title}
+              src={post.image}
+              alt={post.title}
               loading="eager"
             />
           </div>
@@ -62,7 +75,7 @@ const { Content } = await post.render();
       </header>
 
       <div class="blog-post-content">
-        <Content />
+        <Fragment set:html={renderedBody} />
       </div>
 
       <footer class="blog-post-footer">
@@ -70,10 +83,10 @@ const { Content } = await post.render();
           ← Kembali ke Berita
         </a>
 
-        {post.data.tags.length > 0 && (
+        {post.tags.length > 0 && (
           <div class="blog-tags">
             <span class="tags-label">Tags:</span>
-            {post.data.tags.map((tag) => (
+            {post.tags.map((tag) => (
               <span class="tag">{tag}</span>
             ))}
           </div>
@@ -112,9 +125,7 @@ const { Content } = await post.render();
     margin-bottom: 20px;
   }
 
-  .meta-separator {
-    color: #ccc;
-  }
+  .meta-separator { color: #ccc; }
 
   .category,
   .location {
@@ -180,44 +191,13 @@ const { Content } = await post.render();
     margin-bottom: 16px;
   }
 
-  .blog-post-content :global(p) {
-    margin-bottom: 20px;
-  }
-
-  .blog-post-content :global(ul),
-  .blog-post-content :global(ol) {
-    margin-bottom: 20px;
-    padding-left: 24px;
-  }
-
-  .blog-post-content :global(li) {
-    margin-bottom: 8px;
-  }
-
-  .blog-post-content :global(a) {
-    color: #1a1a1a;
-    text-decoration: underline;
-    font-weight: 500;
-  }
-
-  .blog-post-content :global(a:hover) {
-    color: #666;
-  }
-
-  .blog-post-content :global(img) {
-    max-width: 100%;
-    height: auto;
-    border-radius: 12px;
-    margin: 32px 0;
-  }
-
-  .blog-post-content :global(blockquote) {
-    border-left: 4px solid #1a1a1a;
-    padding-left: 20px;
-    margin: 32px 0;
-    font-style: italic;
-    color: #666;
-  }
+  .blog-post-content :global(p) { margin-bottom: 20px; }
+  .blog-post-content :global(ul), .blog-post-content :global(ol) { margin-bottom: 20px; padding-left: 24px; }
+  .blog-post-content :global(li) { margin-bottom: 8px; }
+  .blog-post-content :global(a) { color: #1a1a1a; text-decoration: underline; font-weight: 500; }
+  .blog-post-content :global(a:hover) { color: #666; }
+  .blog-post-content :global(img) { max-width: 100%; height: auto; border-radius: 12px; margin: 32px 0; }
+  .blog-post-content :global(blockquote) { border-left: 4px solid #1a1a1a; padding-left: 20px; margin: 32px 0; font-style: italic; color: #666; }
 
   .blog-post-footer {
     margin-top: 64px;
@@ -237,9 +217,7 @@ const { Content } = await post.render();
     transition: color 0.2s;
   }
 
-  .back-to-blog:hover {
-    color: #666;
-  }
+  .back-to-blog:hover { color: #666; }
 
   .blog-tags {
     display: flex;
@@ -266,29 +244,11 @@ const { Content } = await post.render();
   }
 
   @media (max-width: 768px) {
-    .blog-container {
-      padding: 100px 16px 60px;
-    }
-
-    .blog-post-title {
-      font-size: 36px;
-    }
-
-    .blog-post-excerpt {
-      font-size: 18px;
-    }
-
-    .blog-post-content {
-      font-size: 16px;
-    }
-
-    .blog-post-content :global(h2) {
-      font-size: 28px;
-      margin-top: 32px;
-    }
-
-    .blog-post-content :global(h3) {
-      font-size: 20px;
-    }
+    .blog-container { padding: 100px 16px 60px; }
+    .blog-post-title { font-size: 36px; }
+    .blog-post-excerpt { font-size: 18px; }
+    .blog-post-content { font-size: 16px; }
+    .blog-post-content :global(h2) { font-size: 28px; margin-top: 32px; }
+    .blog-post-content :global(h3) { font-size: 20px; }
   }
 </style>

@@ -1,11 +1,23 @@
 ---
-import { getCollection } from 'astro:content';
+import { getAllBlogPosts, BlogApiError } from '../../lib/blog';
 import Layout from '../../layouts/Layout.astro';
 
-const allPosts = await getCollection('blog');
-const sortedPosts = allPosts.sort((a, b) =>
-  new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf()
-);
+let error: string | null = null;
+let sortedPosts: any[] = [];
+
+try {
+  const allPosts = await getAllBlogPosts();
+  sortedPosts = allPosts.sort((a, b) =>
+    new Date(b.pubDate).valueOf() - new Date(a.pubDate).valueOf()
+  );
+} catch (err) {
+  if (err instanceof BlogApiError) {
+    error = err.message;
+  } else {
+    error = 'Terjadi kesalahan saat memuat artikel. Silakan coba lagi nanti.';
+  }
+  console.error('[berita/index] Error:', err);
+}
 ---
 
 <Layout title="Berita | UNO JERSEY" showPreloader={false}>
@@ -17,15 +29,47 @@ const sortedPosts = allPosts.sort((a, b) =>
       </p>
     </header>
 
+    {error ? (
+      <div class="error-state">
+        <div class="error-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        </div>
+        <h2 class="error-title">Gagal Memuat Artikel</h2>
+        <p class="error-message">{error}</p>
+        <div class="error-actions">
+          <button onclick="location.reload()" class="btn-retry">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Coba Lagi
+          </button>
+          <a href="/" class="btn-home">Kembali ke Beranda</a>
+        </div>
+      </div>
+    ) : sortedPosts.length === 0 ? (
+      <div class="error-state">
+        <div class="empty-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+          </svg>
+        </div>
+        <h2 class="error-title">Belum Ada Artikel</h2>
+        <p class="error-message">Artikel sedang disiapkan. Silakan kunjungi kembali nanti.</p>
+        <a href="/" class="btn-retry">Kembali ke Beranda</a>
+      </div>
+    ) : (
+      <>
     <div class="blog-grid" id="blogGrid">
       {sortedPosts.slice(0, 6).map((post, index) => (
         <article class="blog-card loaded" data-index={index}>
           <a href={`/berita/${post.slug}/`} class="blog-card-link">
-            {post.data.featuredImage && (
+            {post.image && (
               <div class="blog-card-image">
                 <img
-                  data-src={post.data.featuredImage}
-                  alt={post.data.title}
+                  data-src={post.image}
+                  alt={post.title}
                   class="lazy-img"
                 />
                 <div class="skeleton-image"></div>
@@ -33,25 +77,25 @@ const sortedPosts = allPosts.sort((a, b) =>
             )}
             <div class="blog-card-content">
               <div class="blog-card-meta">
-                <time datetime={post.data.pubDate}>
-                  {new Date(post.data.pubDate).toLocaleDateString('id-ID', {
+                <time datetime={post.pubDate}>
+                  {new Date(post.pubDate).toLocaleDateString('id-ID', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
                   })}
                 </time>
-                {post.data.category && (
+                {post.category && (
                   <>
                     <span class="meta-separator">•</span>
-                    <span class="category">{post.data.category}</span>
+                    <span class="category">{post.category}</span>
                   </>
                 )}
               </div>
               <h2 class="blog-card-title">
-                {post.data.title}
+                {post.title}
               </h2>
               <p class="blog-card-excerpt">
-                {post.data.description}
+                {post.excerpt}
               </p>
             </div>
           </a>
@@ -69,20 +113,20 @@ const sortedPosts = allPosts.sort((a, b) =>
         </button>
       </div>
     )}
+    </>
+    )}
   </div>
 
   <script define:vars={{ sortedPosts }}>
     (function() {
       'use strict';
 
-      // Lazy load images with IntersectionObserver
       const lazyLoadImages = () => {
         const imageObserver = new IntersectionObserver((entries, observer) => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
               const img = entry.target;
               const src = img.getAttribute('data-src');
-
               if (src) {
                 img.onload = () => {
                   img.classList.add('loaded');
@@ -97,33 +141,21 @@ const sortedPosts = allPosts.sort((a, b) =>
               }
             }
           });
-        }, {
-          rootMargin: '50px',
-          threshold: 0.1
-        });
-
-        document.querySelectorAll('.lazy-img').forEach(img => {
-          imageObserver.observe(img);
-        });
+        }, { rootMargin: '50px', threshold: 0.1 });
+        document.querySelectorAll('.lazy-img').forEach(img => imageObserver.observe(img));
       };
 
-      // Initialize lazy loading
       if ('IntersectionObserver' in window) {
         lazyLoadImages();
       } else {
-        // Fallback for older browsers
         document.querySelectorAll('.lazy-img').forEach(img => {
           const src = img.getAttribute('data-src');
-          if (src) {
-            img.src = src;
-            img.classList.add('loaded');
-          }
+          if (src) { img.src = src; img.classList.add('loaded'); }
         });
       }
 
       const blogGrid = document.getElementById('blogGrid');
       const loadMoreBtn = document.getElementById('loadMoreBtn');
-
       if (!loadMoreBtn) return;
 
       let currentPage = 1;
@@ -131,7 +163,6 @@ const sortedPosts = allPosts.sort((a, b) =>
       const totalPosts = sortedPosts.length;
       const totalPages = Math.ceil(totalPosts / postsPerPage);
 
-      // Create skeleton card
       const createSkeletonCard = () => {
         const article = document.createElement('article');
         article.className = 'blog-card skeleton';
@@ -156,16 +187,12 @@ const sortedPosts = allPosts.sort((a, b) =>
       loadMoreBtn.addEventListener('click', function() {
         currentPage++;
         loadMoreBtn.disabled = true;
-        loadMoreBtn.innerHTML = `
-          <span class="spinner"></span>
-          Memuat...
-        `;
+        loadMoreBtn.innerHTML = `<span class="spinner"></span> Memuat...`;
 
         const startIndex = currentPage * postsPerPage;
         const endIndex = startIndex + postsPerPage;
         const postsToShow = sortedPosts.slice(startIndex, endIndex);
 
-        // Add skeleton cards first
         const skeletons = [];
         postsToShow.forEach(() => {
           const skeleton = createSkeletonCard();
@@ -173,7 +200,6 @@ const sortedPosts = allPosts.sort((a, b) =>
           skeletons.push(skeleton);
         });
 
-        // After showing skeleton, replace with real content
         setTimeout(() => {
           skeletons.forEach((skeleton, index) => {
             const post = postsToShow[index];
@@ -186,43 +212,27 @@ const sortedPosts = allPosts.sort((a, b) =>
 
             article.innerHTML = `
               <a href="/berita/${post.slug}/" class="blog-card-link">
-                ${post.data.featuredImage ? `
+                ${post.image ? `
                   <div class="blog-card-image">
-                    <img
-                      data-src="${post.data.featuredImage}"
-                      alt="${post.data.title}"
-                      class="lazy-img"
-                    />
+                    <img data-src="${post.image}" alt="${post.title}" class="lazy-img" />
                     <div class="skeleton-image"></div>
                   </div>
                 ` : ''}
                 <div class="blog-card-content">
                   <div class="blog-card-meta">
-                    <time datetime="${post.data.pubDate}">
-                      ${new Date(post.data.pubDate).toLocaleDateString('id-ID', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
+                    <time datetime="${post.pubDate}">
+                      ${new Date(post.pubDate).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
                     </time>
-                    ${post.data.category ? `
-                      <span class="meta-separator">•</span>
-                      <span class="category">${post.data.category}</span>
-                    ` : ''}
+                    ${post.category ? `<span class="meta-separator">•</span><span class="category">${post.category}</span>` : ''}
                   </div>
-                  <h2 class="blog-card-title">
-                    ${post.data.title}
-                  </h2>
-                  <p class="blog-card-excerpt">
-                    ${post.data.description}
-                  </p>
+                  <h2 class="blog-card-title">${post.title}</h2>
+                  <p class="blog-card-excerpt">${post.excerpt}</p>
                 </div>
               </a>
             `;
 
             blogGrid.replaceChild(article, skeleton);
 
-            // Lazy load the new image
             const newImg = article.querySelector('.lazy-img');
             if (newImg && 'IntersectionObserver' in window) {
               const imageObserver = new IntersectionObserver((entries, observer) => {
@@ -231,58 +241,32 @@ const sortedPosts = allPosts.sort((a, b) =>
                     const img = entry.target;
                     const src = img.getAttribute('data-src');
                     if (src) {
-                      img.onload = () => {
-                        img.classList.add('loaded');
-                        const skel = img.parentElement?.querySelector('.skeleton-image');
-                        if (skel) {
-                          skel.style.opacity = '0';
-                          setTimeout(() => skel.remove(), 300);
-                        }
-                      };
+                      img.onload = () => { img.classList.add('loaded'); };
                       img.src = src;
                       observer.unobserve(img);
                     }
                   }
                 });
-              }, {
-                rootMargin: '50px',
-                threshold: 0.1
-              });
+              }, { rootMargin: '50px', threshold: 0.1 });
               imageObserver.observe(newImg);
             } else if (newImg) {
               const src = newImg.getAttribute('data-src');
-              if (src) {
-                newImg.src = src;
-                newImg.classList.add('loaded');
-              }
+              if (src) { newImg.src = src; newImg.classList.add('loaded'); }
             }
 
-            // Animate in
             setTimeout(() => {
               article.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
               article.style.opacity = '1';
               article.style.transform = 'translateY(0)';
-
-              // Remove inline styles after animation completes to match server-rendered cards
-              setTimeout(() => {
-                article.style.transition = '';
-                article.style.opacity = '';
-                article.style.transform = '';
-              }, 500);
+              setTimeout(() => { article.style.transition = ''; article.style.opacity = ''; article.style.transform = ''; }, 500);
             }, index * 100);
           });
 
-          // Reset button
           if (currentPage >= totalPages) {
             loadMoreBtn.style.display = 'none';
           } else {
             loadMoreBtn.disabled = false;
-            loadMoreBtn.innerHTML = `
-              Muat Lebih Banyak
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path d="M12 5v14M5 12l7 7 7-7"/>
-              </svg>
-            `;
+            loadMoreBtn.innerHTML = `Muat Lebih Banyak <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>`;
           }
         }, 300);
       });
@@ -371,28 +355,18 @@ const sortedPosts = allPosts.sort((a, b) =>
     transform: scale(1.05);
   }
 
-  /* Skeleton image */
   .skeleton-image {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      90deg,
-      #f0f0f0 25%,
-      #e0e0e0 50%,
-      #f0f0f0 75%
-    );
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
     transition: opacity 0.3s ease;
   }
 
   @keyframes shimmer {
-    0% {
-      background-position: 200% 0;
-    }
-    100% {
-      background-position: -200% 0;
-    }
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
   }
 
   .blog-card-content {
@@ -409,9 +383,7 @@ const sortedPosts = allPosts.sort((a, b) =>
     margin-bottom: 12px;
   }
 
-  .meta-separator {
-    color: #ccc;
-  }
+  .meta-separator { color: #ccc; }
 
   .category {
     color: #1a1a1a;
@@ -440,65 +412,13 @@ const sortedPosts = allPosts.sort((a, b) =>
     overflow: hidden;
   }
 
-  /* Skeleton elements */
-  .skeleton {
-    pointer-events: none;
-  }
+  .skeleton { pointer-events: none; }
+  .skeleton-meta { width: 120px; height: 14px; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px; margin-bottom: 12px; }
+  .skeleton-title { width: 100%; height: 28px; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px; margin-bottom: 8px; }
+  .skeleton-excerpt { width: 100%; height: 14px; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px; margin-bottom: 6px; }
+  .skeleton-excerpt:last-child { width: 70%; }
 
-  .skeleton-meta {
-    width: 120px;
-    height: 14px;
-    background: linear-gradient(
-      90deg,
-      #f0f0f0 25%,
-      #e0e0e0 50%,
-      #f0f0f0 75%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: 4px;
-    margin-bottom: 12px;
-  }
-
-  .skeleton-title {
-    width: 100%;
-    height: 28px;
-    background: linear-gradient(
-      90deg,
-      #f0f0f0 25%,
-      #e0e0e0 50%,
-      #f0f0f0 75%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: 4px;
-    margin-bottom: 8px;
-  }
-
-  .skeleton-excerpt {
-    width: 100%;
-    height: 14px;
-    background: linear-gradient(
-      90deg,
-      #f0f0f0 25%,
-      #e0e0e0 50%,
-      #f0f0f0 75%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: 4px;
-    margin-bottom: 6px;
-  }
-
-  .skeleton-excerpt:last-child {
-    width: 70%;
-  }
-
-  .load-more-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 60px;
-  }
+  .load-more-container { display: flex; justify-content: center; margin-top: 60px; }
 
   .load-more-btn {
     display: inline-flex;
@@ -522,24 +442,11 @@ const sortedPosts = allPosts.sort((a, b) =>
     box-shadow: 0 8px 20px rgba(230, 57, 70, 0.3);
   }
 
-  .load-more-btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
+  .load-more-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+  .load-more-btn:active { transform: translateY(0); }
+  .load-more-btn svg { transition: transform 0.3s ease; }
+  .load-more-btn:hover:not(:disabled) svg { transform: translateY(2px); }
 
-  .load-more-btn:active {
-    transform: translateY(0);
-  }
-
-  .load-more-btn svg {
-    transition: transform 0.3s ease;
-  }
-
-  .load-more-btn:hover:not(:disabled) svg {
-    transform: translateY(2px);
-  }
-
-  /* Spinner */
   .spinner {
     width: 18px;
     height: 18px;
@@ -549,45 +456,110 @@ const sortedPosts = allPosts.sort((a, b) =>
     animation: spin 0.8s linear infinite;
   }
 
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Error & Empty State */
+  .error-state {
+    text-align: center;
+    padding: 80px 20px;
+  }
+
+  .error-icon, .empty-icon {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .error-icon {
+    background: #fef2f2;
+    color: #f87171;
+  }
+
+  .empty-icon {
+    background: #eff6ff;
+    color: #60a5fa;
+  }
+
+  .error-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+    letter-spacing: 0.02em;
+  }
+
+  .error-message {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    color: #666;
+    max-width: 400px;
+    margin: 0 auto 32px;
+    line-height: 1.6;
+  }
+
+  .error-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-retry {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: #E63946;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .btn-retry:hover {
+    background: #c1121f;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(230, 57, 70, 0.3);
+  }
+
+  .btn-home {
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 28px;
+    background: transparent;
+    color: #1a1a1a;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    border: 2px solid #e5e5e5;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .btn-home:hover {
+    border-color: #1a1a1a;
+    background: #fafafa;
   }
 
   @media (max-width: 768px) {
-    .blog-container {
-      padding: 60px 16px 30px;
-    }
-
-    .blog-title {
-      font-size: 40px;
-    }
-
-    .blog-subtitle {
-      font-size: 16px;
-    }
-
-    .blog-grid {
-      grid-template-columns: 1fr;
-      gap: 24px;
-    }
-
-    .blog-card-image {
-      height: 200px;
-    }
-
-    .blog-card-content {
-      padding: 20px;
-    }
-
-    .blog-card-title {
-      font-size: 24px;
-    }
-
-    .load-more-btn {
-      padding: 14px 28px;
-      font-size: 15px;
-    }
+    .blog-container { padding: 60px 16px 30px; }
+    .blog-title { font-size: 40px; }
+    .blog-subtitle { font-size: 16px; }
+    .blog-grid { grid-template-columns: 1fr; gap: 24px; }
+    .blog-card-image { height: 200px; }
+    .blog-card-content { padding: 20px; }
+    .blog-card-title { font-size: 24px; }
+    .load-more-btn { padding: 14px 28px; font-size: 15px; }
   }
 </style>
