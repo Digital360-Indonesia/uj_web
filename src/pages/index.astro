@@ -5,6 +5,70 @@ import ProductsSection from '../components/ProductsSection.astro';
 import TemukanPreview from '../components/TemukanPreview.astro';
 import BannerCTA from '../components/BannerCTA.astro';
 import PortfolioSection from '../components/PortfolioSection.astro';
+
+// JSON-LD: LocalBusiness + Organization
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "Store",
+  "name": "UNO JERSEY",
+  "description": "Custom premium quality jerseys for your team. Basketball, Football, Futsal, Volleyball, Baseball and more.",
+  "url": "https://unojersey.com",
+  "telephone": "+6285117088199",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Jl. Sidosermo IV Gg. III No. 37",
+    "addressLocality": "Surabaya",
+    "addressRegion": "Jawa Timur",
+    "postalCode": "60234",
+    "addressCountry": "ID"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": -7.3084,
+    "longitude": 112.7551
+  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+      "opens": "08:00",
+      "closes": "17:00"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": "Saturday",
+      "opens": "08:00",
+      "closes": "15:00"
+    }
+  ],
+  "sameAs": [
+    "https://www.instagram.com/unojersey_id",
+    "https://www.tiktok.com/@unojersey_id",
+    "https://unojersey.com/go-gmb/"
+  ],
+  "priceRange": "$$"
+};
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "UNO JERSEY",
+  "url": "https://unojersey.com",
+  "logo": "https://unojersey.com/images/UNO-Black.png",
+  "description": "Spesialis pembuatan jersey custom berkualitas tinggi di Surabaya.",
+  "sameAs": [
+    "https://www.instagram.com/unojersey_id",
+    "https://www.tiktok.com/@unojersey_id"
+  ]
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "UNO JERSEY",
+  "url": "https://unojersey.com",
+  "inLanguage": "id-ID"
+};
 ---
 
 <Layout
@@ -15,6 +79,14 @@ import PortfolioSection from '../components/PortfolioSection.astro';
   navbarLogoColor="black"
   showPreloader={true}
 >
+  <!-- H1 for SEO (visually hidden, Hero shows logo visually) -->
+  <h1 class="sr-only">UNO JERSEY — Custom Jersey Murah Surabaya | Basketball, Football, Futsal, Volleyball, Baseball</h1>
+
+  <!-- Structured Data -->
+  <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
+
   <main>
     <!-- Hero Section -->
     <Hero />
@@ -32,3 +104,17 @@ import PortfolioSection from '../components/PortfolioSection.astro';
     <PortfolioSection />
   </main>
 </Layout>
+
+<style>
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

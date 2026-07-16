@@ -10,6 +10,7 @@ interface Props {
   showFooter?: boolean;
   navbarLogoColor?: 'black' | 'white';
   showPreloader?: boolean;
+  ogImage?: string;
 }
 
 const {
@@ -18,8 +19,13 @@ const {
   showNavbar = true,
   showFooter = true,
   navbarLogoColor = 'black',
-  showPreloader = false
+  showPreloader = false,
+  ogImage = '/images/og-image.jpg'
 } = Astro.props;
+
+// Build canonical & OG URLs from current page path
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageAbsolute = new URL(ogImage, Astro.site).href;
 ---
 
 <!doctype html>
@@ -31,24 +37,34 @@ const {
     <meta name="keywords" content="jersey, custom jersey, basketball jersey, football jersey, futsal jersey, volleyball jersey, UNO JERSEY" />
     <meta name="author" content="UNO JERSEY" />
 
+    <!-- Canonical -->
+    <link rel="canonical" href={canonicalURL} />
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://unojersey.com/" />
+    <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content="/images/og-image.jpg" />
+    <meta property="og:image" content={ogImageAbsolute} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="UNO JERSEY" />
+    <meta property="og:locale" content="id_ID" />
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://unojersey.com/" />
-    <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content="/images/og-image.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageAbsolute} />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#E63946" />
 
     <title>{title}</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
 
     <!-- Preload Critical Resources -->
     <link rel="preload" href="/images/UNO-White.png" as="image" />
@@ -193,11 +209,11 @@ const {
     </style>
 
     <!-- Three.js -->
-    <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <!-- GSAP -->
-    <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
     <!-- Google tag (gtag.js) -->
     <script is:inline src="https://www.googletagmanager.com/gtag/js?id=G-HWXXE5WFQL"></script>
@@ -241,7 +257,7 @@ const {
 
           let progress = 0;
           const targetProgress = 100;
-          const minDuration = 10000;
+          const minDuration = 2000;
           const loadingInterval = 50;
           const incrementPerTick = targetProgress / (minDuration / loadingInterval);
 
@@ -265,9 +281,7 @@ const {
             }
           }, loadingInterval);
 
-          window.addEventListener('load', () => {
-            console.log('Page loaded, continuing preloader animation...');
-          });
+          window.addEventListener('load', () => {});
 
           setTimeout(() => {
             if (!preloader.classList.contains('preloader-hidden')) {
@@ -281,7 +295,7 @@ const {
                 }, 600);
               }, 500);
             }
-          }, 12000);
+          }, 3000);
         })();
       </script>
     )}

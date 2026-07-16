@@ -27,7 +27,7 @@ if (post.body && !post.body.startsWith('<')) {
 }
 ---
 
-<Layout title={post.title} description={post.excerpt} showPreloader={false}>
+<Layout title={post.title} description={post.excerpt} showPreloader={false} ogImage={post.image || '/images/og-image.jpg'}>
   <div class="blog-container">
     <article class="blog-post">
       <header class="blog-post-header">

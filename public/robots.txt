@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Link-in-bio pages (thin, no SEO value)
+Disallow: /go-fb/
+Disallow: /go-ig/
+Disallow: /go-gmb/
+Disallow: /go-tt/
+
+# Sitemap
+Sitemap: https://unojersey.com/sitemap-index.xml

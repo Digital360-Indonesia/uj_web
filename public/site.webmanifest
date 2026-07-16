@@ -1,0 +1,21 @@
+{
+  "name": "UNO JERSEY — Custom Premium Quality Jerseys",
+  "short_name": "UNO JERSEY",
+  "description": "Custom premium quality jerseys for your team. Basketball, Football, Futsal, Volleyball, Baseball and more.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#E63946",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "any",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

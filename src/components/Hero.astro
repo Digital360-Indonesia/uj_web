@@ -177,15 +177,11 @@ const { navbarId = 'navbar' } = Astro.props;
     const navbarLogo = document.getElementById('navbar-logo');
     const scrollIndicator = document.getElementById('scroll-indicator');
 
-    console.log('Hero: Initializing - heroLogo:', !!heroLogo, 'navbar:', !!navbar);
-
     if (!heroLogo) {
-      console.error('Hero: hero-logo element not found');
       return;
     }
 
     if (!navbar) {
-      console.error('Hero: navbar element not found');
       return;
     }
 
@@ -266,8 +262,6 @@ const { navbarId = 'navbar' } = Astro.props;
 
     // Initial call
     handleScroll();
-
-    console.log('Hero: Logo transition initialized');
 
     // Scroll indicator click
     if (scrollIndicator) {
